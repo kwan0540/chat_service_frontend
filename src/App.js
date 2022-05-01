@@ -1,24 +1,34 @@
-import logo from './logo.svg';
+import { useEffect, useState } from 'react';
 import './App.css';
+import Login from './components/Login'
+import Chat from './components/Chat'
 
 function App() {
+  const [login, setLogin] = useState(false)
+  const [ws, setWs] = useState(null)
+  const [text, setText] = useState([])
+  const [user, setUser] = useState(null)
+  useEffect(() => {
+    const isLogin = sessionStorage.getItem('token')
+    if (isLogin !== 'undefined' && isLogin) {
+      setLogin(true)
+    }
+  }, [])
+  useEffect(() => {
+    console.log(ws)
+    if (ws) {
+      console.log('success')
+      ws.on(`${user.chat_room_id}_Message`, message => {
+        setText(old => [...old, message])
+      })
+    }
+  }, [ws])
+  console.log(text)
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      {!login? <Login login={setLogin} websocket={setWs} userinfo={setUser}/>: <Chat ws={ws} getText={text} userinfo={user}/>}
     </div>
+    
   );
 }
 
